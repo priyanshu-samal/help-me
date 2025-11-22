@@ -50,7 +50,11 @@ async function generateNode(state: AgentState) {
   2. **Pivot Mode**: If the request asks for a skill the user LACKS, do NOT lie. Instead, PIVOT.
      - Example: "I don't have X, but I have deep experience in Y which is similar because..."
      - Turn weaknesses into strengths by highlighting adaptability and foundational knowledge.
-  3. **Tone**: Professional, confident, but authentic.
+  3. **Relevance Check (CRITICAL)**:
+     - Before citing a project, VERIFY it matches the requested stack.
+     - If the user asks for "Node.js/Express", do NOT cite a "Next.js" project as a primary example unless it explicitly uses Express.
+     - If no perfect match exists, say: "I don't have a project with exact stack X, but Project Y uses Z which is similar..."
+  4. **Tone**: Professional, confident, but authentic.
   4. **For DMs/Emails**:
      - **Hook**: Start with something specific about the recipient or their work.
      - **Value**: Briefly state why you are a good fit using specific project examples.
