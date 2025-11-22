@@ -28,7 +28,7 @@ export async function fetchUserRepos(username: string, token?: string): Promise<
     const { data } = await octokit.repos.listForUser({
       username,
       sort: "pushed",
-      per_page: 10, // Limit to top 10 most recent for now
+      per_page: 100, // Increased limit to fetch more repos
       type: "owner",
     });
 
