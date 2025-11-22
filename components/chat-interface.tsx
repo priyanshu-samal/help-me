@@ -80,7 +80,7 @@ export function ChatInterface() {
                                         : "bg-muted"
                                         }`}
                                 >
-                                    <div className="prose prose-sm dark:prose-invert">
+                                    <div className="prose prose-sm dark:prose-invert break-words whitespace-pre-wrap max-w-none">
                                         <ReactMarkdown>
                                             {msg.content}
                                         </ReactMarkdown>
