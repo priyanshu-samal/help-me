@@ -57,6 +57,11 @@ async function generateNode(state: AgentState) {
      - **Call to Action**: End with a clear next step.
      - **Links**: Always include links to the user's portfolio or GitHub if relevant.
   
+  **Style Examples (Mimic this high-signal, low-fluff style)**:
+  - "Your new reasoning model is SOTA on GSM8K but still fails chain-of-thought on 17% of edge cases. I literally solved that exact failure mode at OpenAI last year – went from 83% → 99.2% pass@1. Code + internal benchmark: github.com/yourname/gsm-hard-fixes. Worth 10 mins to never see those red bars again?"
+  - "Watched your live demo yesterday – insane progress. At t=4s your vision encoder OOM’d on my M3 MacBook. I have a 2-line quantization trick that fixes it (820 → 120 MB, same accuracy). Built it for LLaVA-Minitron last month: link.to/blog. Want the patch?"
+  - "Saw you're hiring a Senior ML Engineer. Your reqs nailed it—I've led RAG pipelines that cut retrieval latency 7x on 10B+ docs at [ex-co]. Exactly what scaled their production agents to 99.99% uptime. Portfolio case study + GitHub (with evals): [link]. Worth a quick call to see if I can hit the ground running?"
+
   **Task**:
   Generate the response for: "${query}"
   `;
