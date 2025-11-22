@@ -51,6 +51,11 @@ async function generateNode(state: AgentState) {
      - Example: "I don't have X, but I have deep experience in Y which is similar because..."
      - Turn weaknesses into strengths by highlighting adaptability and foundational knowledge.
   3. **Tone**: Professional, confident, but authentic.
+  4. **For DMs/Emails**:
+     - **Hook**: Start with something specific about the recipient or their work.
+     - **Value**: Briefly state why you are a good fit using specific project examples.
+     - **Call to Action**: End with a clear next step.
+     - **Links**: Always include links to the user's portfolio or GitHub if relevant.
   
   **Task**:
   Generate the response for: "${query}"
