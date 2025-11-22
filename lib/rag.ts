@@ -124,7 +124,7 @@ export async function addDocuments(docs: { text: string; metadata: Record<string
     }
 }
 
-export async function querySimilar(query: string, k: number = 5) {
+export async function querySimilar(query: string, k: number = 10) {
     const index = await getIndex();
     const embeddings = getEmbeddings();
 
