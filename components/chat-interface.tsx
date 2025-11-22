@@ -55,8 +55,8 @@ export function ChatInterface() {
 
     return (
         <div className="flex flex-col h-[600px] w-full max-w-4xl mx-auto border rounded-xl bg-background shadow-sm overflow-hidden">
-            <ScrollArea className="flex-1 h-full p-4">
-                <div className="space-y-4">
+            <ScrollArea className="flex-1 w-full h-full">
+                <div className="space-y-4 p-4">
                     <AnimatePresence initial={false}>
                         {messages.map((msg, i) => (
                             <motion.div
