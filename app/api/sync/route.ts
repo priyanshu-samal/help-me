@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { bio } = await req.json();
+        const { bio, repos: selectedRepos } = await req.json();
 
         // @ts-ignore
         const token = session.accessToken;
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         const userData = await userRes.json();
         const githubUsername = userData.login;
 
-        // Clear old memory
+        // Clear old memory to start fresh
         await clearMemory();
 
         const docs: { text: string; metadata: Record<string, any> }[] = [];
@@ -41,42 +41,58 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // 2. Fetch Repos (Authenticated = Higher Limits)
-        const repos = await fetchUserRepos(githubUsername, token);
+        // 2. Process Selected Repos
+        // If no repos selected (legacy call), we might want to fetch all, but for now let's rely on selection
+        const reposToSync = selectedRepos || [];
 
-        for (const repo of repos) {
-            // Add Repo Info
-            docs.push({
-                text: `Repository: ${repo.name}\nDescription: ${repo.description}\nLanguage: ${repo.language}\nTopics: ${repo.topics.join(", ")}`,
-                metadata: { type: "repo_info", source: "github", repo: repo.name },
-            });
+        console.log(`Syncing ${reposToSync.length} selected repositories...`);
 
-            // Fetch package.json
-            const packageJson = await fetchFileContent(githubUsername, repo.name, "package.json", token);
-            if (packageJson) {
-                const skills = extractSkillsFromPackageJson(packageJson);
-                if (skills.length > 0) {
+        for (const repoItem of reposToSync) {
+            const repoName = repoItem.name;
+            const tags = repoItem.tags || [];
+
+            // Fetch Repo Info (we need description etc, so we might need to fetch individual repo or pass it from frontend)
+            // To save API calls, let's fetch the single repo details
+            try {
+                const repoRes = await fetch(`https://api.github.com/repos/${githubUsername}/${repoName}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const repoData = await repoRes.json();
+
+                // Add Repo Info with Tags
+                docs.push({
+                    text: `Repository: ${repoData.name}\nDescription: ${repoData.description}\nLanguage: ${repoData.language}\nTopics: ${repoData.topics?.join(", ")}\nTags: ${tags.join(", ")}`,
+                    metadata: { type: "repo_info", source: "github", repo: repoData.name, tags: tags },
+                });
+
+                // Fetch package.json
+                const packageJson = await fetchFileContent(githubUsername, repoName, "package.json", token);
+                if (packageJson) {
+                    const skills = extractSkillsFromPackageJson(packageJson);
+                    if (skills.length > 0) {
+                        docs.push({
+                            text: `Skills used in ${repoName}: ${skills.join(", ")}`,
+                            metadata: { type: "skills", source: "package.json", repo: repoName, tags: tags },
+                        });
+                    }
+                }
+
+                // Fetch README
+                const readme = await fetchFileContent(githubUsername, repoName, "README.md", token);
+                if (readme) {
+                    const truncatedReadme = readme.slice(0, 3000);
                     docs.push({
-                        text: `Skills used in ${repo.name}: ${skills.join(", ")}`,
-                        metadata: { type: "skills", source: "package.json", repo: repo.name },
+                        text: `README for ${repoName}:\n${truncatedReadme}`,
+                        metadata: { type: "readme", source: "README.md", repo: repoName, tags: tags },
                     });
                 }
-            }
 
-            // Fetch README
-            const readme = await fetchFileContent(githubUsername, repo.name, "README.md", token);
-            if (readme) {
-                // Truncate README to avoid huge context and cost
-                const truncatedReadme = readme.slice(0, 3000);
-                docs.push({
-                    text: `README for ${repo.name}:\n${truncatedReadme}`,
-                    metadata: { type: "readme", source: "README.md", repo: repo.name },
-                });
+            } catch (e) {
+                console.error(`Failed to sync repo ${repoName}:`, e);
             }
         }
 
         // Ingest into Vector Store
-        // We pass all docs to addDocuments, which now handles batching and rate limiting internally.
         console.log(`Ingesting ${docs.length} documents...`);
 
         if (docs.length > 0) {
