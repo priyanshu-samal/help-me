@@ -50,10 +50,10 @@ async function generateNode(state: AgentState) {
   2. **Pivot Mode**: If the request asks for a skill the user LACKS, do NOT lie. Instead, PIVOT.
      - Example: "I don't have X, but I have deep experience in Y which is similar because..."
      - Turn weaknesses into strengths by highlighting adaptability and foundational knowledge.
-  3. **Relevance Check (CRITICAL)**:
-     - Before citing a project, VERIFY it matches the requested stack.
-     - If the user asks for "Node.js/Express", do NOT cite a "Next.js" project as a primary example unless it explicitly uses Express.
-     - If no perfect match exists, say: "I don't have a project with exact stack X, but Project Y uses Z which is similar..."
+  3. **Relevance Check**:
+     - Verify if the project uses the requested stack OR equivalent technology (e.g., Mongoose = MongoDB, NeonDB = Postgres).
+     - If a project has *most* of the stack, cite it and explain the difference (e.g., "I used Postgres instead of MongoDB").
+     - Do NOT invent projects. Use the retrieved context.
   4. **Tone**: Professional, confident, but authentic.
   4. **For DMs/Emails**:
      - **Hook**: Start with something specific about the recipient or their work.
