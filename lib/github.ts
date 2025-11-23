@@ -74,7 +74,46 @@ export function extractSkillsFromPackageJson(content: string): string[] {
   try {
     const json = JSON.parse(content);
     const deps = { ...json.dependencies, ...json.devDependencies };
-    return Object.keys(deps);
+    const rawSkills = Object.keys(deps);
+
+    // Normalize skills (e.g., mongoose -> MongoDB)
+    const skillMap: Record<string, string> = {
+      "mongoose": "MongoDB",
+      "mongodb": "MongoDB",
+      "pg": "PostgreSQL",
+      "sequelize": "SQL",
+      "typeorm": "SQL",
+      "prisma": "SQL/Postgres",
+      "redis": "Redis",
+      "ioredis": "Redis",
+      "socket.io": "WebSockets",
+      "express": "Express.js",
+      "next": "Next.js",
+      "react": "React",
+      "vue": "Vue.js",
+      "tailwindcss": "Tailwind CSS",
+      "typescript": "TypeScript",
+      "openai": "OpenAI API",
+      "langchain": "LangChain",
+      "pinecone-client": "Pinecone",
+      "@pinecone-database/pinecone": "Pinecone",
+    };
+
+    const normalizedSkills = new Set<string>();
+
+    rawSkills.forEach(skill => {
+      // Add the raw skill
+      normalizedSkills.add(skill);
+      // Add the mapped skill if it exists
+      if (skillMap[skill]) {
+        normalizedSkills.add(skillMap[skill]);
+      }
+      // Check for partial matches (e.g. @types/react)
+      if (skill.includes("react")) normalizedSkills.add("React");
+      if (skill.includes("next")) normalizedSkills.add("Next.js");
+    });
+
+    return Array.from(normalizedSkills);
   } catch (e) {
     return [];
   }
